@@ -1,0 +1,38 @@
+{
+    "name": "shipu/php-sslwireless-payment",
+    "description": "PHP client for SSL Wireless Payment API",
+    "keywords": ["SSL Wireless", "php", "api", "sms", "php-ssl-payment"],
+    "type": "library",
+    "require": {
+        "php": ">=5.5.9",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+
+    "license": "CC(1.0)",
+    "authors": [
+        {
+            "name": "Shipu Ahamed",
+            "email": "shipuahamed01@gmail.com"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "Shipu\\SslWPayment\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Shipu\\SslWPayment\\SslWPaymentServiceProvider"
+            ],
+            "aliases": {
+                "Payment": "Shipu\\SslWPayment\\Facades\\Payment"
+            }
+        }
+    }
+}
