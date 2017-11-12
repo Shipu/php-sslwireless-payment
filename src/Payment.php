@@ -2,11 +2,18 @@
 
 namespace Shipu\SslWPayment;
 
+use Shipu\SslWPayment\Exceptions\RouteOrUrlNotFound;
+
 class Payment extends AbstractApi
 {
     protected $config;
     protected $params = [];
 
+    /**
+     * Payment constructor.
+     *
+     * @param $config
+     */
     public function __construct( $config )
     {
         $this->config = $config;
@@ -14,11 +21,23 @@ class Payment extends AbstractApi
         parent::__construct();
     }
 
+    /**
+     * Getting Payment Url
+     *
+     * @return string
+     */
     public function paymentUrl()
     {
         return $this->client->baseUrl . 'gwprocess/v3/process.php';
     }
 
+    /**
+     * Set Customer Info
+     *
+     * @param array $info
+     *
+     * @return $this
+     */
     public function customer( $info = [] )
     {
         $this->params = array_merge($this->params, $info);
@@ -26,6 +45,27 @@ class Payment extends AbstractApi
         return $this;
     }
 
+    /**
+     * Set Transaction Id
+     *
+     * @param null $transaction
+     *
+     * @return $this
+     */
+    public function transactionId( $transaction = null )
+    {
+        $this->params['tran_id'] = $transaction;
+
+        return $this;
+    }
+
+    /**
+     * Set Payment Amount
+     *
+     * @param $amount
+     *
+     * @return $this
+     */
     public function amount( $amount )
     {
         $this->params[ 'total_amount' ] = $amount;
@@ -33,6 +73,11 @@ class Payment extends AbstractApi
         return $this;
     }
 
+    /**
+     * Getting Redirect Url
+     *
+     * @return $this
+     */
     public function redirectUrl()
     {
         $redirectUrl = $this->config[ 'redirect_url' ];
@@ -43,6 +88,13 @@ class Payment extends AbstractApi
         return $this;
     }
 
+    /**
+     * Set Version
+     *
+     * @param string $version
+     *
+     * @return $this
+     */
     public function version( $version = '3.00' )
     {
         $this->params[ 'version' ] = $version;
@@ -50,6 +102,11 @@ class Payment extends AbstractApi
         return $this;
     }
 
+    /**
+     * Generate Transactions
+     *
+     * @return $this
+     */
     public function generateTransaction()
     {
         $this->params[ 'tran_id' ] = uniqid(true) . microtime(true);
@@ -57,6 +114,10 @@ class Payment extends AbstractApi
         return $this;
     }
 
+    /**
+     * Getting Hidden Input Value
+     * @return string
+     */
     public function hiddenValue()
     {
         $formString = '';
@@ -67,6 +128,15 @@ class Payment extends AbstractApi
         return $formString;
     }
 
+    /**
+     * Checking Valid Response Request with amount and transactionId
+     *
+     * @param $request
+     * @param null $amount
+     * @param null $transactionId
+     *
+     * @return bool
+     */
     public function valid( $request, $amount = null, $transactionId = null )
     {
         if (
@@ -80,47 +150,67 @@ class Payment extends AbstractApi
         return false;
     }
 
+    /**
+     * Checking Valid Amount in response
+     *
+     * @param $request
+     * @param $amount
+     *
+     * @return bool
+     */
     public function validAmount( $request, $amount )
     {
         return $this->sslCommerzValidationApiResponse($request, $amount);
     }
 
+    /**
+     * Checking valid transaction id in response
+     *
+     * @param $request
+     * @param $transactionId
+     *
+     * @return bool
+     */
     public function validTransactionId( $request, $transactionId )
     {
         return $this->sslCommerzValidationApiResponse($request, null, $transactionId);
     }
 
 
+    /**
+     * Checking Hash Versify
+     *
+     * @param $request
+     *
+     * @return bool
+     */
     private function hashVerify( $request )
     {
-        $store_passwd = $this->config[ 'store_password' ];
+        $storePassword = $this->config[ 'store_password' ];
 
         if ( isset($request[ 'verify_sign' ]) && isset($request[ 'verify_key' ]) ) {
-            # NEW ARRAY DECLARED TO TAKE VALUE OF ALL POST
 
-            $pre_define_key = explode(',', $request[ 'verify_key' ]);
+            $preDefineKey = explode(',', $request[ 'verify_key' ]);
 
-            $new_data = [];
-            if ( !empty($pre_define_key) ) {
-                foreach ( $pre_define_key as $value ) {
+            $newData = [];
+            if ( !empty($preDefineKey) ) {
+                foreach ( $preDefineKey as $value ) {
                     if ( isset($request[ $value ]) ) {
-                        $new_data[ $value ] = ( $request[ $value ] );
+                        $newData[ $value ] = ( $request[ $value ] );
                     }
                 }
             }
-            # ADD MD5 OF STORE PASSWORD
-            $new_data[ 'store_passwd' ] = md5($store_passwd);
+            $newData[ 'store_passwd' ] = md5($storePassword);
 
-            # SORT THE KEY AS BEFORE
-            ksort($new_data);
+            ksort($newData);
 
-            $hash_string = "";
-            foreach ( $new_data as $key => $value ) {
-                $hash_string .= $key . '=' . ( $value ) . '&';
+            $hashString = "";
+            foreach ( $newData as $key => $value ) {
+                $hashString .= $key . '=' . ( $value ) . '&';
             }
-            $hash_string = rtrim($hash_string, '&');
+            $hashString = rtrim($hashString, '&');
 
-            if ( md5($hash_string) == $request[ 'verify_sign' ] ) {
+            if ( md5($hashString) == $request[ 'verify_sign' ] ) {
                 return true;
             } else {
                 return false;
@@ -130,6 +220,13 @@ class Payment extends AbstractApi
         }
     }
 
+    /**
+     * Checking Valid Status
+     *
+     * @param $request
+     *
+     * @return bool
+     */
     private function statusFieldValidity( $request )
     {
         if ( $request[ 'status' ] == 'VALID' ) {
@@ -139,6 +236,15 @@ class Payment extends AbstractApi
         return false;
     }
 
+    /**
+     * Checking Valid Response
+     *
+     * @param $request
+     * @param null $amount
+     * @param null $transactionId
+     *
+     * @return bool
+     */
     private function sslCommerzValidationApiResponse( $request, $amount = null, $transactionId = null )
     {
         $query = [
@@ -170,17 +276,28 @@ class Payment extends AbstractApi
         return $flag;
     }
 
+    /**
+     * Getting Route or url
+     *
+     * @param $array
+     *
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
+     * @throws RouteOrUrlNotFound
+     */
     private function routeOrUrl( $array )
     {
-        if ( isset($array[ 'route' ]) && !is_null($array[ 'route' ]) ) {
+        if ( isset($array[ 'route' ]) && !is_null($array[ 'route' ]) && $array[ 'route' ] != '' ) {
             return route($array[ 'route' ]);
-        } elseif ( isset($array[ 'url' ]) && !is_null($array[ 'url' ]) ) {
+        } elseif ( isset($array[ 'url' ]) && !is_null($array[ 'url' ]) && $array[ 'url' ] != '' ) {
             return url($array[ 'url' ]);
         }
 
-        return new \Exception();
+        throw new RouteOrUrlNotFound();
     }
 
+    /**
+     * Pre build Parameter for post request
+     */
     private function preBuildParameter()
     {
         $this->params[ 'store_id' ] = $this->config[ 'store_id' ];
