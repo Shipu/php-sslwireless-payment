@@ -54,6 +54,10 @@ class Payment extends AbstractApi
      */
     public function transactionId( $transaction = null )
     {
+        if(is_null($transaction)) {
+            $transaction = $this->generateTransaction();
+        }
+
         $this->params['tran_id'] = $transaction;
 
         return $this;
@@ -120,6 +124,10 @@ class Payment extends AbstractApi
      */
     public function hiddenValue()
     {
+        if(!isset($this->params['tran_id'])) {
+            $this->params['tran_id'] = $this->generateTransaction();
+        }
+
         $formString = '';
         foreach ( $this->params as $name => $value ) {
             $formString .= "<input type=\"hidden\" name=\"" . $name . "\" value=\"" . $value . "\" />";

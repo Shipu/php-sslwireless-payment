@@ -92,8 +92,136 @@ return [
 
 ## Usages
 
-Its very easy to use. This packages has a lot of functionality and features.
+- Mandatory input field name
+    - tran_id
+    - cus_name
+    - cus_email
+    - cus_phone
 
+#### Getting Payment Post Url
+
+In PHP:
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment($config);
+return $payment->paymentUrl();
+```
+In Laravel:
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->paymentUrl();
+```
+
+#### Getting Hidden Input Field
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->customer([
+    'cus_name'  => 'Shipu Ahamed', // Customer name
+    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+    'cus_phone' => '01616022669' // Customer Phone
+])->transactionId('21005455540')->amount(3500)->hiddenValue();
+```
+Where Transaction id is random value. you can generate by yourself or follow bellow steps:
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->customer([
+    'cus_name'  => 'Shipu Ahamed', // Customer name
+    'cus_phone' => '01616022669' // Customer Phone
+    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+])->transactionId()->amount(3500)->hiddenValue();
+
+or 
+
+return $payment->customer([
+    'cus_name'  => 'Shipu Ahamed', // Customer name
+    'cus_phone' => '01616022669' // Customer Phone
+    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+])->amount(3500)->hiddenValue();
+```
+#### Generate Transaction Id
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->generateTransaction();
+```
+
+#### Checking Valid Response
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->valid($request); // where `$request` is after post response in your success, fail or cancel url.
+```
+Checking valid response with amount:
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->valid($request, '3500'); // where `$request` is after post response in your success, fail or cancel url.
+```
+
+Checking valid response with amount and transaction id:
+```
+use \Shipu\SslWPayment\Payment;
+
+...
+
+$payment = new Payment(config('sslwpayment'));
+return $payment->valid($request, '3500', '21005455540'); // where `$request` is after post response in your success, fail or cancel url.
+```
+
+## In Blade
+
+#### Getting Payment Post Url
+```
+{{ ssl_wireless_payment_url() }}
+```
+
+#### Getting Hidden Input Field
+```
+{!!
+    ssl_wireless_hidden_input([
+        'tran_id'   => '21005455540', // random number
+        'cus_name'  => 'Shipu Ahamed', // Customer name
+        'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+        'cus_phone' => '01616022669' // Customer Phone
+    ], 3500) 
+!!}
+```
+
+#### Complete Post Button View 
+```
+{!! 
+ssl_wireless_post_button([
+    'tran_id'   => '21005455540', // random number
+    'cus_name'  => 'Shipu Ahamed', // Customer name
+    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+    'cus_phone' => '01616022669' // Customer Phone
+], 2000, '<i class="fa fa-money"></i>', 'btn btn-sm btn-success') 
+!!}
+```
 
 
 That's it.
