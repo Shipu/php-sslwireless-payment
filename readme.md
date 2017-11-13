@@ -1,4 +1,4 @@
-# PHP SSL-Wirless Payment client
+# PHP SSL-Wirless Payment Client
 
 php-sslwireless-payment is a PHP client for SSL Wirless Payment Gateway API. This package is also support Laravel.
 
