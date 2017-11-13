@@ -281,3 +281,8 @@ protected $except = [
 - [All Contributors](../../contributors)
 
 Special Thanks to [Tawsif ul Karim](https://github.com/tawsifkarim).
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/Shipu/php-sslwireless-payment/badge.svg?style=beer-square)](https://beerpay.io/Shipu/php-sslwireless-payment)  [![Beerpay](https://beerpay.io/Shipu/php-sslwireless-payment/make-wish.svg?style=flat-square)](https://beerpay.io/Shipu/php-sslwireless-payment?focus=wish)
