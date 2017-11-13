@@ -1,6 +1,6 @@
 # PHP SSL-Wirless Payment client
 
-php-sslwireless-payment is a PHP client for SSL Wirless Payment API. This package is also support Laravel.
+php-sslwireless-payment is a PHP client for SSL Wirless Payment Gateway API. This package is also support Laravel.
 
 ## Installation
 
@@ -101,7 +101,7 @@ return [
 #### Getting Payment Post Url
 
 In PHP:
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
@@ -110,7 +110,7 @@ $payment = new Payment($config);
 return $payment->paymentUrl();
 ```
 In Laravel:
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
@@ -120,7 +120,7 @@ return $payment->paymentUrl();
 ```
 
 #### Getting Hidden Input Field
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
@@ -133,7 +133,7 @@ return $payment->customer([
 ])->transactionId('21005455540')->amount(3500)->hiddenValue();
 ```
 Where Transaction id is random value. you can generate by yourself or follow bellow steps:
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
@@ -154,7 +154,7 @@ return $payment->customer([
 ])->amount(3500)->hiddenValue();
 ```
 #### Generate Transaction Id
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
@@ -164,43 +164,44 @@ return $payment->generateTransaction();
 ```
 
 #### Checking Valid Response
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
 
 $payment = new Payment(config('sslwpayment'));
-return $payment->valid($request); // where `$request` is after post response in your success, fail or cancel url.
+return $payment->valid($request);
 ```
 Checking valid response with amount:
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
 
 $payment = new Payment(config('sslwpayment'));
-return $payment->valid($request, '3500'); // where `$request` is after post response in your success, fail or cancel url.
+return $payment->valid($request, '3500'); 
 ```
 
 Checking valid response with amount and transaction id:
-```
+```php
 use \Shipu\SslWPayment\Payment;
 
 ...
 
 $payment = new Payment(config('sslwpayment'));
-return $payment->valid($request, '3500', '21005455540'); // where `$request` is after post response in your success, fail or cancel url.
+return $payment->valid($request, '3500', '21005455540');
 ```
+Where `$request` will appear after post response.
 
 ## In Blade
 
 #### Getting Payment Post Url
-```
+```php
 {{ ssl_wireless_payment_url() }}
 ```
 
 #### Getting Hidden Input Field
-```
+```php
 {!!
     ssl_wireless_hidden_input([
         'tran_id'   => '21005455540', // random number
@@ -212,7 +213,7 @@ return $payment->valid($request, '3500', '21005455540'); // where `$request` is 
 ```
 
 #### Complete Post Button View 
-```
+```php
 {!! 
 ssl_wireless_post_button([
     'tran_id'   => '21005455540', // random number
@@ -222,8 +223,61 @@ ssl_wireless_post_button([
 ], 2000, '<i class="fa fa-money"></i>', 'btn btn-sm btn-success') 
 !!}
 ```
+## Example 
 
+##### Route
+```php
+Route::post('payment/success', 'YourMakePaymentsController@paymentSuccess')->name('payment.success');
+Route::post('payment/failed', 'YourMakePaymentsController@paymentFailed')->name('payment.failed');
+Route::post('payment/cancel', 'YourMakePaymentsController@paymentCancel')->name('payment.cancel');
+```
 
-That's it.
+or 
 
-Thank you :)
+```php
+Route::post('payment/success', 'YourMakePaymentsController@paymentSuccessOrFailed')->name('payment.success');
+Route::post('payment/failed', 'YourMakePaymentsController@paymentSuccessOrFailed')->name('payment.failed');
+Route::post('payment/cancel', 'YourMakePaymentsController@paymentSuccessOrFailed')->name('payment.cancel');
+
+```
+##### Controller Method
+```php
+use Shipu\SslWPayment\Facades\Payment;
+
+...
+
+public function paymentSuccessOrFailed(Request $request)
+{
+    if($request->get('status') == 'CANCELLED') {
+        return redirect()->back();
+    }
+    
+    $transactionId = $request->get('tran_id');
+    $valid = Payment::valid($request, 3500, $transactionId);
+    
+    if($valid) {
+        // Successfully Paid.
+    } else {
+       // Something went wrong. 
+    }
+    
+    return redirect()->back();
+}
+```
+
+## To Disable CSRF token
+Open `app/Http/Middleware/VerifyCsrfToken.php` and adding :
+```php
+protected $except = [
+    ...
+    'payment/*',
+    ...
+];
+```
+
+## Credits
+
+- [Shipu Ahamed](https://github.com/shipu)
+- [All Contributors](../../contributors)
+
+Special Thanks to [Tawsif ul Karim](https://github.com/tawsifkarim).
