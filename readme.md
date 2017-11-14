@@ -141,16 +141,16 @@ use \Shipu\SslWPayment\Payment;
 $payment = new Payment(config('sslwpayment'));
 return $payment->customer([
     'cus_name'  => 'Shipu Ahamed', // Customer name
-    'cus_phone' => '01616022669' // Customer Phone
-    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+    'cus_phone' => '01616022669', // Customer Phone
+    'cus_email' => 'shipuahamed01@gmail.com' // Customer email
 ])->transactionId()->amount(3500)->hiddenValue();
 
 or 
 
 return $payment->customer([
     'cus_name'  => 'Shipu Ahamed', // Customer name
-    'cus_phone' => '01616022669' // Customer Phone
-    'cus_email' => 'shipuahamed01@gmail.com', // Customer email
+    'cus_phone' => '01616022669', // Customer Phone
+    'cus_email' => 'shipuahamed01@gmail.com' // Customer email
 ])->amount(3500)->hiddenValue();
 ```
 #### Generate Transaction Id
