@@ -113,9 +113,7 @@ class Payment extends AbstractApi
      */
     public function generateTransaction()
     {
-        $this->params[ 'tran_id' ] = uniqid(true) . microtime(true);
-
-        return $this;
+        return uniqid(true) . microtime(true);
     }
 
     /**
