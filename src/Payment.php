@@ -109,7 +109,7 @@ class Payment extends AbstractApi
     /**
      * Generate Transactions
      *
-     * @return $this
+     * @return string
      */
     public function generateTransaction()
     {
