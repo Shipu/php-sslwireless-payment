@@ -1,23 +1,25 @@
 <?php
 use \Shipu\SslWPayment\Payment;
 
-function ssl_wireless_post_button($input, $amount , $buttonText = 'Payment', $class = '') {
-    return \Form::open([
-            'method' => 'POST',
-            'url'    => ssl_wireless_payment_url(),
-            'style'  => 'display:inline'
-        ]) . ssl_wireless_hidden_input($input, $amount) .
-        \Form::button($buttonText,
-            [ 'type' => 'submit', 'class' => $class ]) .
-        \Form::close();
+if (! function_exists('ssl_wireless_post_button')) {
+    function ssl_wireless_post_button( $input, $amount, $buttonText = 'Payment', $class = '' ) {
+        return '<form action="'.ssl_wireless_payment_url().'" method="POST" style="display:inline">' .
+            ssl_wireless_hidden_input($input, $amount) .
+            '<button type="submit" class="'.$class.'">'.$buttonText.'</button>' .
+            '</form>';
+    }
 }
 
-function ssl_wireless_hidden_input($input, $amount) {
-    $payment = new Payment(config('sslwpayment'));
-    return $payment->customer($input)->amount($amount)->hiddenValue();
+if (! function_exists('ssl_wireless_hidden_input')) {
+    function ssl_wireless_hidden_input($input, $amount) {
+        $payment = new Payment(config('sslwpayment'));
+        return $payment->customer($input)->amount($amount)->hiddenValue();
+    }
 }
 
-function ssl_wireless_payment_url() {
-    $payment = new Payment(config('sslwpayment'));
-    return $payment->paymentUrl();
+if (! function_exists('ssl_wireless_payment_url')) {
+    function ssl_wireless_payment_url() {
+        $payment = new Payment(config('sslwpayment'));
+        return $payment->paymentUrl();
+    }
 }
