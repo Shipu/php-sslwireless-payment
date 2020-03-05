@@ -8,7 +8,7 @@
         "guzzlehttp/guzzle": "^6.2"
     },
 
-    "license": "CC(1.0)",
+    "license": "MIT",
     "authors": [
         {
             "name": "Shipu Ahamed",
