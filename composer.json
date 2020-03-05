@@ -5,8 +5,7 @@
     "type": "library",
     "require": {
         "php": ">=5.5.9",
-        "guzzlehttp/guzzle": "^6.2",
-        "laravelcollective/html": "^5.4.0"
+        "guzzlehttp/guzzle": "^6.2"
     },
 
     "license": "CC(1.0)",
